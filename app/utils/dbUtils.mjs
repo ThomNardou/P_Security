@@ -4,7 +4,7 @@ const dbConfig = {
   host: 'db',
   user: 'root',
   password: 'root',
-  database: 'db_authentication'
+  database: 'db_shop'
 };
 
 
@@ -16,5 +16,16 @@ export const connectToDatabase = async () => {
   } catch (error) {
     console.error("Error connecting to the database:", error);
     throw error;
+  }
+};
+
+// Middleware pour la connexion à la base de données
+export const connectToDatabaseMiddleware = async (req, res, next) => {
+  try {
+    req.dbConnection = await connectToDatabase();
+    next();
+  } catch (error) {
+    console.error("Error connecting to the database:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

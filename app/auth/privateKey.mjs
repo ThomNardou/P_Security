@@ -1,3 +1,3 @@
-const privateK = "MySonIsSpecial";
+const privateK = "MonSayImSpecial";
 
 export {privateK}

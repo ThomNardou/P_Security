@@ -2,42 +2,54 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import fs from "node:fs";
 import { privateK } from "../auth/privateKey.mjs";
+import { checkToken } from "../utils/checkToken.mjs";
+import { generateSalt } from "../utils/generateSalt.mjs";
+
+import sha256 from 'crypto-js/sha256.js'
 
 // Import du module jwt
 
 const router = express.Router();
 
-export const get = (req, res, next) => {
-  const authorizationHeaders = req.headers.authorization;
+export const get = async (req, res, next) => {
+  const usernameQuery = req.params.name;
+  const tokenInfos = await checkToken(req.headers.authorization);
 
-  // Checking if the header exists
-  if (!authorizationHeaders) {
-    const message = `Unvalid token or token not provided`;
-    res.status(401).json({ message });
-  } else {
-    // Extracting the token
-    const token = authorizationHeaders.split(" ")[1];
+  console.log(tokenInfos);
 
-    // Verifying the token
-    jwt.verify(token, privateK, (error, decodedToken) => {
-      if (error) {
-        // If the token fails, return 401
-        const message = "You are not allowed to access this ressource";
-        res.status(401).json({ message });
-      }
-      // Extracting the user's Id from the decoded token
-      const userId = decodedToken.userId;
-
-      return res.status(200).json({ data: decodedToken });
-      next();
-    });
-  }
-
-  // Remplacez cette portion de code par votre traitement du jeton JWT
+  res.status(200).json({
+    message: "Voici vos informations :",
+    user: tokenInfos,
+  });
 };
 
-const auth = (req, res, next) => {};
+export const post = async (req, res) => {
+  const query =
+    "INSERT INTO t_users (name, email, password, salt, isAdmin) VALUES (?,?,?,?,?)";
 
-router.get("/", get);
+  const salt = generateSalt(10);
 
-export default router;
+  let gfg = "GeeksforGeeks";
+  console.log(sha256(gfg).toString());
+
+  try {
+
+    const hashpassword = sha256(salt + req.body.password).toString();
+    const [rows] = await req.dbConnection.execute(query, [
+      req.body.name,
+      req.body.email,
+      hashpassword,
+      salt,
+      0,
+    ]);
+
+    res.status(200).json({
+      message: "Utilisateur créé !",
+    });
+  } catch (err) {
+    res.status(401).json({
+      error: err.message,
+    });
+  }
+};
+

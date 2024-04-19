@@ -1,7 +1,10 @@
 import express from "express";
-import { get } from "../controllers/UserController.mjs";
+import { get, post } from "../controllers/UserController.mjs";
+import { connectToDatabaseMiddleware } from "../utils/dbUtils.mjs";
 
 const router = express.Router();
-router.get('/', get);
+router.get('/', connectToDatabaseMiddleware, get);
+router.post('/', connectToDatabaseMiddleware, post)
+
 
 export default router;

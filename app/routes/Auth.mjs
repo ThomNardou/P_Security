@@ -1,53 +1,39 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-
-// import { privateK } from "../auth/privateKey.mjs";
-
 import fs from "node:fs";
 
-// Il manque l'import du module jwt
+import { privateK } from "../auth/privateKey.mjs";
+import { connectToDatabase, connectToDatabaseMiddleware } from "../utils/dbUtils.mjs";
 
-import { connectToDatabase } from "../utils/dbUtils.mjs";
+
 
 const router = express.Router();
 
-// Middleware pour la connexion à la base de données
-const connectToDatabaseMiddleware = async (req, res, next) => {
-  try {
-    req.dbConnection = await connectToDatabase();
-    next();
-  } catch (error) {
-    console.error("Error connecting to the database:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
+////////////////////////////////////////////////// LOGIN //////////////////////////////////////////////////
 router.post("/", connectToDatabaseMiddleware, async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
   const queryString =
-    "SELECT * FROM t_users WHERE useName = ? AND usePassword = ?";
+    "SELECT * FROM t_users WHERE email = ? AND password = ?";
 
   try {
     const [rows] = await req.dbConnection.execute(queryString, [
-      username,
+      email,
       password,
     ]);
+
+    console.log(rows);
+
     if (rows.length > 0) {
       // signer et renvoyer votre token ici (utiliser un code http de succès)
       const payLoad = {
-        name: "John Doe",
-        foo: "bar",
+        id: rows[0].id,
+        name: rows[0].name,
+        role: rows[0].isAdmin,
+        email: rows[0].email,
       };
 
-      let privateK;
-
-      privateK = fs.readFileSync("auth/privkey.pem", "utf-8");
-
-      console.log(privateK);
-
       const token = generateTokenHS256(privateK, payLoad);
-      // const token = generateTokenHS512(privateK, payLoad)
 
       res.status(200).json({ token: token });
     } else {
@@ -71,16 +57,5 @@ function generateTokenHS256(privateKey, payLoad) {
   return token;
 }
 
-function generateTokenHS512(privateKey, payLoad) {
-  const token = jwt.sign(
-    payLoad,
-    privateKey,
-    { expiresIn: "2h" },
-    { algorithm: "HS512" }
-  );
-
-  console.log("TOKEN : " + token);
-  return token;
-}
 
 export default router;
