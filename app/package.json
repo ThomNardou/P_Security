@@ -4,12 +4,13 @@
   "description": "Une application Node.js",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js -L"
+    "start": "nodemon server.mjs -L --ext mjs,js,json"
   },
+  "type": "module",
   "dependencies": {
     "express": "^4.19.1",
-    "mysql2": "^3.9.1",
-    "dotenv": "^16.4.5",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "mysql2": "^3.9.3",
+    "jsonwebtoken": "^9.0.2"    
   }
 }
