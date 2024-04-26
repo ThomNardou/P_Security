@@ -12,10 +12,16 @@ import express from "express";
 import userRoute from "./routes/User.mjs";
 import authRoute from "./routes/Auth.mjs";
 import { generateSalt } from './utils/generateSalt.mjs';
+import cookieParser from "cookie-parser";
+import cors from 'cors';
+
+
 const app = express();
 
 // Middleware pour la lecture des réponses formatées en json
 app.use(express.json());
+app.use(cookieParser());
+app.use(cors());
 
 // Les routes
 app.use('/user', userRoute);

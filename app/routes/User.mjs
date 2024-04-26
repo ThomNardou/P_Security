@@ -3,7 +3,7 @@ import { get, post } from "../controllers/UserController.mjs";
 import { connectToDatabaseMiddleware } from "../utils/dbUtils.mjs";
 
 const router = express.Router();
-router.get('/', connectToDatabaseMiddleware, get);
+router.get('/:name', connectToDatabaseMiddleware, get);
 router.post('/', connectToDatabaseMiddleware, post)
 
 
