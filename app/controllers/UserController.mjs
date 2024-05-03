@@ -12,12 +12,14 @@ import sha256 from "crypto-js/sha256.js";
 const router = express.Router();
 
 export const get = async (req, res, next) => {
-  const usernameQuery = req.params.name;
 
-  const tokenInfos = await checkToken(res, req.headers.authorization);
+  const usernameQuery = req.params.name;
+  const tokenInfos = await checkToken(res, req.cookies.jwt);
+
+  console.log(tokenInfos);
 
   if (tokenInfos.name !== usernameQuery) {
-    return res.status(401).json({
+    return res.status(403).json({
       message: "Vous n'avez pas les droits pour accéder à ces informations",
     });
   }
@@ -45,8 +47,6 @@ export const post = async (req, res) => {
     "INSERT INTO t_users (name, email, password, salt, isAdmin) VALUES (?,?,?,?,?)";
 
   const salt = generateSalt(10);
-
-  let gfg = "GeeksforGeeks";
 
   try {
     const hashpassword = sha256(salt + req.body.password).toString();

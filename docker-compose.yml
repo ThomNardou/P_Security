@@ -46,8 +46,10 @@ services:
             - /home/node/app/node_modules
         expose:
             - "8080"
+            - "8443"
         ports: 
             - "8080:8080"
+            - "8443:8443"
         command: "npm start"
         #command: "npm run dev"
 

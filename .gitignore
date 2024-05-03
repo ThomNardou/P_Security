@@ -3,3 +3,5 @@ app/.env
 pubkey.pem
 privkey.pem
 privateKey.mjs
+*.key
+*.crt
