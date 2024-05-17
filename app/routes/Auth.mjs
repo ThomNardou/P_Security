@@ -18,15 +18,25 @@ router.post("/", connectToDatabaseMiddleware, async (req, res) => {
 
   const salt = "SELECT salt FROM t_users WHERE name = ?";
   const [dbSalt] = await req.dbConnection.execute(salt, [name]);
-  const hashedPassword = sha256(dbSalt[0].salt + password).toString();
+  
+  if (dbSalt.length === 0) {
+    res.status(401).json({ error: "Invalid name or password" });
+    return;
+  }
+
+  const hashedPassword = sha256(dbSalt[0].salt + password).toString()
 
   const queryString = "SELECT * FROM t_users WHERE name = ? AND password = ?";
+
+  ////////////////////////////////////// A NE PAS FAIRE ///////////////////////////////////////
+  // const queryString = `SELECT * FROM t_users WHERE name = '${name}' AND password = '${hashedPassword}'`;
 
   try {
     const [rows] = await req.dbConnection.execute(queryString, [
       name,
       hashedPassword,
     ]);
+    // const [rows] = await req.dbConnection.execute(queryString);
 
     if (rows.length > 0) {
       // signer et renvoyer votre token ici (utiliser un code http de succès)

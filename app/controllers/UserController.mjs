@@ -67,15 +67,26 @@ export const post = async (req, res) => {
 };
 
 export const getAllUsers = async (req, res) => {
-  const query = "SELECT id, name, email FROM t_users";
 
+  
+  
   const tokenInfos = await checkToken(res, req.cookies.jwt);
-
+  
   if (!tokenInfos.role) {
     return res.status(403).json({
       message: "Vous devez être administrateur pour accéder à ces informations",
     });
   }
+  if (req.query.name) {
+    const query = "SELECT id, name, email FROM t_users WHERE name LIKE ?";
+    const [rows] = await req.dbConnection.execute(query, [`%${req.query.name}%`]);
+    
+    return res.status(200).json({
+      users: rows,
+    });
+  }
+
+  const query = "SELECT id, name, email FROM t_users";
 
   const [rows] = await req.dbConnection.execute(query);
 
