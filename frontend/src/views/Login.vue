@@ -13,6 +13,7 @@
             <input type="password" required id="password">
             <label>Password</label>
           </div>
+          <p class="error">{{ errorMessage }}</p>
           <button type="submit" class="btn">Login</button>
         </form>
       </div>
@@ -27,6 +28,13 @@ import axios from 'axios';
 
 <script>
 export default {
+  data() {
+    return {
+      errorMessage: '',
+      hasError: false,
+      ErrorCode: 0
+    }
+  },
   methods: {
     async login() {
       // Getting the username input value
@@ -72,6 +80,12 @@ export default {
   padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .login {

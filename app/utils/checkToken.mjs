@@ -6,17 +6,14 @@ import { privateK } from "../auth/privateKey.mjs";
 export const checkToken = async (res, tokenGivedByUser) => {
   const authorizationHeaders = tokenGivedByUser;
 
-  // console.log("TOKEN : " + authorizationHeaders)
-
   // Checking if the header exists
   if (!authorizationHeaders) {
     const message = `Unvalid token or token not provided`;
     res.status(401).json({ message });
   } else {
     // Extracting the token
-    const token = authorizationHeaders; 
 
-    console.log(token)
+    const token = authorizationHeaders; 
     // Verifying the token  
     try { 
       jwt.verify(token, privateK);

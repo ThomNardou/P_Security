@@ -16,8 +16,6 @@ export const get = async (req, res, next) => {
   const usernameQuery = req.params.name;
   const tokenInfos = await checkToken(res, req.cookies.jwt);
 
-  console.log(tokenInfos);
-
   if (tokenInfos.name !== usernameQuery) {
     return res.status(403).json({
       message: "Vous n'avez pas les droits pour accéder à ces informations",
@@ -67,3 +65,21 @@ export const post = async (req, res) => {
     });
   }
 };
+
+export const getAllUsers = async (req, res) => {
+  const query = "SELECT id, name, email FROM t_users";
+
+  const tokenInfos = await checkToken(res, req.cookies.jwt);
+
+  if (!tokenInfos.role) {
+    return res.status(403).json({
+      message: "Vous devez être administrateur pour accéder à ces informations",
+    });
+  }
+
+  const [rows] = await req.dbConnection.execute(query);
+
+  res.status(200).json({
+    users: rows,
+  });
+}
